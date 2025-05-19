@@ -105,8 +105,7 @@ export class AuthService {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...result } = user; // remove password from user object
-
+    const { password, refreshToken, ...result } = user; // remove password from user object
     return result;
   }
 
