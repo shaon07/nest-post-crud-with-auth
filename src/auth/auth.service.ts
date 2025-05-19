@@ -7,6 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import { plainToInstance } from 'class-transformer';
 import { Repository } from 'typeorm';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -41,15 +42,9 @@ export class AuthService {
     });
 
     const savedUser = await this.userRepository.save(user);
+    const result = plainToInstance(User, savedUser);
     return {
-      user: {
-        id: savedUser.id,
-        username: savedUser.username,
-        email: savedUser.email,
-        role: savedUser.role,
-        createdAt: savedUser.createdAt,
-        updatedAt: savedUser.updatedAt,
-      },
+      user: result,
       message: 'User registered successfully. Please login to access your account',
     }; // return the user without the password inf
   }
@@ -74,20 +69,14 @@ export class AuthService {
 
     const { accessToken, refreshToken } = this.generateToken(user);
 
-    await this.userRepository.save({
+    const savedUser = await this.userRepository.save({
       ...user,
       refreshToken,
     });
 
+    const result = plainToInstance(User, savedUser);
     return {
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },
+      user: result,
       accessToken,
       refreshToken,
     };
@@ -104,8 +93,7 @@ export class AuthService {
       return null;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, refreshToken, ...result } = user; // remove password from user object
+    const result = plainToInstance(User, user);
     return result;
   }
 
