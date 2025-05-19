@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { CurrentUser } from 'src/auth/decorators/current-user.dto';
 import { User } from 'src/auth/entities/user.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
@@ -18,5 +18,20 @@ export class PostsController {
   @Post('/')
   async create(@Body() createPostDto: CreatePostDto, @CurrentUser() user: User) {
     return await this.postsService.create(createPostDto, user);
+  }
+
+  @Get('/:id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.postsService.findOne(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('/:id')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updatePostDto: CreatePostDto,
+    @CurrentUser() user: User,
+  ) {
+    return await this.postsService.update(id, updatePostDto, user);
   }
 }
