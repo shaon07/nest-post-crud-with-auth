@@ -5,6 +5,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { User } from './auth/entities/user.entity';
+import { Post } from './posts/entities/post.entity';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
   imports: [
@@ -18,10 +20,11 @@ import { User } from './auth/entities/user.entity';
       username: 'postgres',
       password: '538232',
       database: 'nest-crud',
-      entities: [User],
+      entities: [User, Post],
       synchronize: true, // disable in production
     }),
     AuthModule,
+    PostsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
