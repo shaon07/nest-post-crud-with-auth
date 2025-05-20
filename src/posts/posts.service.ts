@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
-import { User } from 'src/auth/entities/user.entity';
+import { User, UserRole } from 'src/auth/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Post } from './entities/post.entity';
@@ -41,12 +41,24 @@ export class PostsService {
       throw new NotFoundException('Post not found');
     }
 
-    if (post.author.id !== user.id) {
-      throw new NotFoundException('You are not authorized to update this post');
+    if (post.author.id !== user.id && user.role === UserRole.USER) {
+      throw new ForbiddenException('You are not authorized to update this post');
     }
 
     Object.assign(post, updatePostDto);
     const updatedPost = await this.postRepository.save(post);
     return plainToInstance(Post, updatedPost);
+  }
+
+  async delete(id: number) {
+    const post = await this.postRepository.findOne({
+      where: { id },
+    });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+    await this.postRepository.delete(id);
+    return { data: null, message: 'Post deleted successfully' };
   }
 }

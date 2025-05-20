@@ -34,7 +34,7 @@ export class User {
     enum: UserRole,
     default: UserRole.USER,
   })
-  role?: UserRole.USER;
+  role: UserRole.USER;
 
   @OneToMany(() => Post, post => post.author)
   posts: Post[];
